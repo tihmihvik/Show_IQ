@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtCore import Qt
 from settings import SettingsWindow
 
 class StartWindow(QMainWindow):
@@ -10,36 +11,43 @@ class StartWindow(QMainWindow):
         # Создаем центральный виджет и компоновку
         central_widget = QWidget()
         layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Кнопка "Начать игру"
-        start_game_button = QPushButton("Начать игру")
-        start_game_button.clicked.connect(self.open_settings_window)
-        layout.addWidget(start_game_button)
+        start_button = QPushButton("Начать игру")
+        start_button.setFixedWidth(start_button.sizeHint().width())
+        start_button.clicked.connect(self.open_settings)
+        layout.addWidget(start_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Кнопка "Продолжить игру"
-        continue_button = QPushButton("Продолжить игру")
-        continue_button.clicked.connect(self.continue_game)
-        layout.addWidget(continue_button)
+        # Кнопка "Запуск сохранённой игры"
+        load_button = QPushButton("Запуск сохранённой игры")
+        load_button.setFixedWidth(load_button.sizeHint().width())
+        load_button.clicked.connect(self.load_game)
+        layout.addWidget(load_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Кнопка "Выйти из игры"
-        exit_button = QPushButton("Выйти из игры")
-        exit_button.clicked.connect(self.exit_game)
-        layout.addWidget(exit_button)
+        # Кнопка "Выход"
+        exit_button = QPushButton("Выход")
+        exit_button.setFixedWidth(exit_button.sizeHint().width())
+        exit_button.clicked.connect(self.exit_app)
+        layout.addWidget(exit_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Устанавливаем компоновку и центральный виджет
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
+        self.adjustSize()
 
-    def open_settings_window(self):
-        # Открытие окна настроек
+    def open_settings(self):
         self.settings_window = SettingsWindow()
         self.settings_window.show()
+        self.close()
 
-    def continue_game(self):
-        # Логика для продолжения игры
-        print("Продолжить игру")
+    def start_game(self):
+        # Логика для начала новой игры
+        print("Начать игру")
 
-    def exit_game(self):
-        # Логика для выхода из игры
-        print("Выйти из игры")
+    def load_game(self):
+        # Логика для запуска сохранённой игры
+        print("Запуск сохранённой игры")
+
+    def exit_app(self):
         self.close()

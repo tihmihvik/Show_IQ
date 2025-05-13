@@ -1,19 +1,16 @@
-from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel
+from PyQt6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget
 
 class SettingsWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Настройки игры")
-        self.setGeometry(200, 200, 400, 300)
+        self.setGeometry(200, 200, 300, 200)
 
-        # Создаем центральный виджет и компоновку
         central_widget = QWidget()
         layout = QVBoxLayout()
 
-        # Пример настройки: текстовая метка
-        label = QLabel("Настройки игры будут здесь")
+        label = QLabel("Здесь будут настройки игры")
         layout.addWidget(label)
 
-        # Устанавливаем компоновку и центральный виджет
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
