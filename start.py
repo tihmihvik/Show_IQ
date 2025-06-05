@@ -5,7 +5,8 @@ from settings import SettingsWindow
 class StartWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Окно игры")
+        print("StartWindow создан")
+        self.setWindowTitle("Старт")
         self.setGeometry(150, 150, 400, 300)
 
         # Создаем центральный виджет и компоновку
@@ -13,8 +14,8 @@ class StartWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # Кнопка "Начать игру"
-        start_button = QPushButton("Начать игру")
+        # Кнопка "Начать новую игру"
+        start_button = QPushButton("Начать новую игру")
         start_button.setFixedWidth(start_button.sizeHint().width())
         start_button.clicked.connect(self.open_settings)
         layout.addWidget(start_button, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -35,8 +36,16 @@ class StartWindow(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
         self.adjustSize()
+        self.center_on_screen()
+
+    def center_on_screen(self):
+        screen = self.screen().availableGeometry().center()
+        frame = self.frameGeometry()
+        frame.moveCenter(screen)
+        self.move(frame.topLeft())
 
     def open_settings(self):
+        print("Открытие окна SettingsWindow")
         self.settings_window = SettingsWindow()
         self.settings_window.show()
         self.close()
