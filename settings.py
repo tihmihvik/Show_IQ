@@ -119,6 +119,18 @@ class SettingsWindow(QMainWindow):
         self.questions_info.setReadOnly(True)
         self.questions_info.setFixedHeight(60)
         self.combobox_layout.addWidget(self.questions_info)
+
+        # Кнопки в самом низу окна
+        from PyQt6.QtWidgets import QPushButton, QHBoxLayout
+        button_layout = QHBoxLayout()
+        self.save_exit_btn = QPushButton("Сохранить и выйти")
+        self.save_continue_btn = QPushButton("Сохранить и продолжить")
+        self.cancel_btn = QPushButton("Отмена")
+        self.cancel_btn.clicked.connect(self.close)
+        button_layout.addWidget(self.save_exit_btn)
+        button_layout.addWidget(self.save_continue_btn)
+        button_layout.addWidget(self.cancel_btn)
+        self.combobox_layout.addLayout(button_layout)
         # После обновления — снова вывести информацию
         self.load_questions_info()
 
