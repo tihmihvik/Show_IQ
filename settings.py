@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QRadioButton, QButtonGroup, QComboBox, QLabel
+from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QRadioButton, QButtonGroup, QComboBox, QLabel, QLineEdit, QTextEdit
 from PyQt6.QtCore import Qt
 import os
 import re
@@ -61,8 +61,8 @@ class SettingsWindow(QMainWindow):
         self.load_questions()
 
     def update_team_selectors(self):
-        from PyQt6.QtWidgets import QLabel, QHBoxLayout, QPushButton
-        # Очистить старые комбобоксы и лейблы
+        from PyQt6.QtWidgets import QLabel, QHBoxLayout, QPushButton, QTextEdit
+        # Очистить старые комбобоксы, лейблы, строки, кнопки и заголовок
         for cb in self.comboboxes:
             self.combobox_layout.removeWidget(cb)
             cb.deleteLater()
@@ -74,8 +74,24 @@ class SettingsWindow(QMainWindow):
         self.combo_labels = []
         if hasattr(self, 'combo_rows'):
             for row in self.combo_rows:
+                # Удаляем все виджеты из row_layout
+                for i in reversed(range(row.count())):
+                    item = row.itemAt(i)
+                    widget = item.widget()
+                    if widget is not None:
+                        row.removeWidget(widget)
+                        widget.deleteLater()
                 self.combobox_layout.removeItem(row)
         self.combo_rows = []
+        # Удалить старый заголовок и поле, если они есть
+        if hasattr(self, 'load_label') and self.load_label is not None:
+            self.combobox_layout.removeWidget(self.load_label)
+            self.load_label.deleteLater()
+            self.load_label = None
+        if hasattr(self, 'questions_info') and self.questions_info is not None:
+            self.combobox_layout.removeWidget(self.questions_info)
+            self.questions_info.deleteLater()
+            self.questions_info = None
 
         count = 4 if self.radio_4.isChecked() else 10
         for i in range(count):
@@ -94,17 +110,17 @@ class SettingsWindow(QMainWindow):
             clear_btn.clicked.connect(lambda _, c=combo: c.setCurrentIndex(0))
             row_layout.addWidget(clear_btn)
             self.combobox_layout.addLayout(row_layout)
-            if not hasattr(self, 'combo_rows'):
-                self.combo_rows = []
             self.combo_rows.append(row_layout)
 
-        # После всех выпадающих списков и кнопок
-        from PyQt6.QtWidgets import QLabel, QLineEdit
-        load_label = QLabel("Загрузка списка вопросов:")
-        self.combobox_layout.addWidget(load_label)
-        self.questions_info = QLineEdit()
+        # Добавить только один заголовок и поле внизу
+        self.load_label = QLabel("Загрузка списка вопросов:")
+        self.combobox_layout.addWidget(self.load_label)
+        self.questions_info = QTextEdit()
         self.questions_info.setReadOnly(True)
+        self.questions_info.setFixedHeight(60)
         self.combobox_layout.addWidget(self.questions_info)
+        # После обновления — снова вывести информацию
+        self.load_questions_info()
 
     def handle_combobox_change(self):
         # Получить выбранные значения
@@ -159,4 +175,13 @@ class SettingsWindow(QMainWindow):
             f"Тем с оценкой 2 балла: {len(self.questions_2)}, вопросов: {sum(len(v) for v in self.questions_2.values())}\n"
             f"Тем с оценкой 3 балла: {len(self.questions_3)}, вопросов: {sum(len(v) for v in self.questions_3.values())}"
         )
-        self.questions_info.setText(info)
+        self.questions_info.setPlainText(info)
+
+    def load_questions_info(self):
+        if hasattr(self, 'questions_1') and hasattr(self, 'questions_2') and hasattr(self, 'questions_3'):
+            info = (
+                f"Тем с оценкой 1 балл: {len(self.questions_1)}, вопросов: {sum(len(v) for v in self.questions_1.values())}\n"
+                f"Тем с оценкой 2 балла: {len(self.questions_2)}, вопросов: {sum(len(v) for v in self.questions_2.values())}\n"
+                f"Тем с оценкой 3 балла: {len(self.questions_3)}, вопросов: {sum(len(v) for v in self.questions_3.values())}"
+            )
+            self.questions_info.setPlainText(info)
