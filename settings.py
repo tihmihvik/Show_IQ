@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QRadioButton, QBu
 from PyQt6.QtCore import Qt
 import os
 import re
+from save_settings import SaveSettingsDialog
 
 class SettingsWindow(QMainWindow):
     def __init__(self):
@@ -92,6 +93,16 @@ class SettingsWindow(QMainWindow):
             self.combobox_layout.removeWidget(self.questions_info)
             self.questions_info.deleteLater()
             self.questions_info = None
+        # Удалить старый блок кнопок, если есть
+        if hasattr(self, 'button_layout') and self.button_layout is not None:
+            # Удаляем все кнопки из layout и сам layout
+            for i in reversed(range(self.button_layout.count())):
+                btn = self.button_layout.itemAt(i).widget()
+                if btn is not None:
+                    self.button_layout.removeWidget(btn)
+                    btn.deleteLater()
+            self.combobox_layout.removeItem(self.button_layout)
+            self.button_layout = None
 
         count = 4 if self.radio_4.isChecked() else 10
         for i in range(count):
@@ -119,20 +130,22 @@ class SettingsWindow(QMainWindow):
         self.questions_info.setReadOnly(True)
         self.questions_info.setFixedHeight(60)
         self.combobox_layout.addWidget(self.questions_info)
-
-        # Кнопки в самом низу окна
+        # Кнопки в самом низу окна (добавлять только если ещё не добавлены)
         from PyQt6.QtWidgets import QPushButton, QHBoxLayout
-        button_layout = QHBoxLayout()
-        self.save_exit_btn = QPushButton("Сохранить и выйти")
-        self.save_continue_btn = QPushButton("Сохранить и продолжить")
-        self.cancel_btn = QPushButton("Отмена")
-        self.cancel_btn.clicked.connect(self.close)
-        button_layout.addWidget(self.save_exit_btn)
-        button_layout.addWidget(self.save_continue_btn)
-        button_layout.addWidget(self.cancel_btn)
-        self.combobox_layout.addLayout(button_layout)
+        if not hasattr(self, 'button_layout') or self.button_layout is None:
+            self.button_layout = QHBoxLayout()
+            self.save_exit_btn = QPushButton("Сохранить и выйти")
+            self.save_continue_btn = QPushButton("Сохранить и продолжить")
+            self.cancel_btn = QPushButton("Отмена")
+            self.cancel_btn.clicked.connect(self.close)
+            self.button_layout.addWidget(self.save_exit_btn)
+            self.button_layout.addWidget(self.save_continue_btn)
+            self.button_layout.addWidget(self.cancel_btn)
+            self.combobox_layout.addLayout(self.button_layout)
+
         # После обновления — снова вывести информацию
         self.load_questions_info()
+        self.adjustSize()
 
     def handle_combobox_change(self):
         # Получить выбранные значения
@@ -197,3 +210,12 @@ class SettingsWindow(QMainWindow):
                 f"Тем с оценкой 3 балла: {len(self.questions_3)}, вопросов: {sum(len(v) for v in self.questions_3.values())}"
             )
             self.questions_info.setPlainText(info)
+
+    def open_save_dialog(self):
+        dialog = SaveSettingsDialog(self)
+        dialog.exec()
+
+    def open_save_dialog_exit(self):
+        dialog = SaveSettingsDialog(self)
+        if dialog.exec() == dialog.Accepted:
+            self.close()
