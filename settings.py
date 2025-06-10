@@ -137,11 +137,24 @@ class SettingsWindow(QMainWindow):
             self.save_exit_btn = QPushButton("Сохранить и выйти")
             self.save_continue_btn = QPushButton("Сохранить и продолжить")
             self.cancel_btn = QPushButton("Отмена")
-            self.cancel_btn.clicked.connect(self.close)
-            self.button_layout.addWidget(self.save_exit_btn)
-            self.button_layout.addWidget(self.save_continue_btn)
-            self.button_layout.addWidget(self.cancel_btn)
             self.combobox_layout.addLayout(self.button_layout)
+        else:
+            # Очищаем layout, если он уже есть
+            for i in reversed(range(self.button_layout.count())):
+                btn = self.button_layout.itemAt(i).widget()
+                if btn is not None:
+                    self.button_layout.removeWidget(btn)
+                    btn.deleteLater()
+            self.save_exit_btn = QPushButton("Сохранить и выйти")
+            self.save_continue_btn = QPushButton("Сохранить и продолжить")
+            self.cancel_btn = QPushButton("Отмена")
+        # Подключаем обработчики
+        self.save_exit_btn.clicked.connect(self.open_save_dialog_exit)
+        self.save_continue_btn.clicked.connect(self.open_save_dialog_exit)
+        self.cancel_btn.clicked.connect(self.close)
+        self.button_layout.addWidget(self.save_exit_btn)
+        self.button_layout.addWidget(self.save_continue_btn)
+        self.button_layout.addWidget(self.cancel_btn)
 
         # После обновления — снова вывести информацию
         self.load_questions_info()
@@ -191,9 +204,6 @@ class SettingsWindow(QMainWindow):
         self.questions_1 = q1
         self.questions_2 = q2
         self.questions_3 = q3
-        print('Словарь для 3 баллов:')
-        for k, v in self.questions_3.items():
-            print(f'{k}: {v}')
         # Вывод информации в текстовое поле
         info = (
             f"Тем с оценкой 1 балл: {len(self.questions_1)}, вопросов: {sum(len(v) for v in self.questions_1.values())}\n"
@@ -217,5 +227,4 @@ class SettingsWindow(QMainWindow):
 
     def open_save_dialog_exit(self):
         dialog = SaveSettingsDialog(self)
-        if dialog.exec() == dialog.Accepted:
-            self.close()
+        dialog.exec()

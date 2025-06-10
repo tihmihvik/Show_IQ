@@ -5,7 +5,6 @@ from settings import SettingsWindow
 class StartWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        print("StartWindow создан")
         self.setWindowTitle("Старт")
         self.setGeometry(150, 150, 400, 300)
 
@@ -20,8 +19,8 @@ class StartWindow(QMainWindow):
         start_button.clicked.connect(self.open_settings)
         layout.addWidget(start_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Кнопка "Запуск сохранённой игры"
-        load_button = QPushButton("Запуск сохранённой игры")
+        # Кнопка "Продолжить игру"
+        load_button = QPushButton("Продолжить игру")
         load_button.setFixedWidth(load_button.sizeHint().width())
         load_button.clicked.connect(self.load_game)
         layout.addWidget(load_button, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -36,16 +35,8 @@ class StartWindow(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
         self.adjustSize()
-        self.center_on_screen()
-
-    def center_on_screen(self):
-        screen = self.screen().availableGeometry().center()
-        frame = self.frameGeometry()
-        frame.moveCenter(screen)
-        self.move(frame.topLeft())
 
     def open_settings(self):
-        print("Открытие окна SettingsWindow")
         self.settings_window = SettingsWindow()
         self.settings_window.show()
         self.close()
