@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QRadioButton, QBu
 from PyQt6.QtCore import Qt
 import os
 import re
+import random
 from save_settings import SaveSettingsDialog
 
 class SettingsWindow(QMainWindow):
@@ -24,11 +25,15 @@ class SettingsWindow(QMainWindow):
         self.layout.addWidget(self.radio_4)
         self.layout.addWidget(self.radio_10)
 
-        # Заголовок "Жеребьёвка"
-        from PyQt6.QtWidgets import QLabel
+        # Заголовок "Жеребьёвка" и кнопка справа
+        from PyQt6.QtWidgets import QLabel, QPushButton, QHBoxLayout
+        draw_layout = QHBoxLayout()
         draw_label = QLabel("Жеребьёвка")
         draw_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.layout.addWidget(draw_label)
+        draw_layout.addWidget(draw_label)
+        self.draw_button = QPushButton("Выполнить жеребьёвку")
+        draw_layout.addWidget(self.draw_button)
+        self.layout.addLayout(draw_layout)
 
         self.radio_4.toggled.connect(self.update_team_selectors)
         self.radio_10.toggled.connect(self.update_team_selectors)
@@ -60,6 +65,8 @@ class SettingsWindow(QMainWindow):
 
         self.update_team_selectors()
         self.load_questions()
+
+        self.draw_button.clicked.connect(self.perform_draw)
 
     def update_team_selectors(self):
         from PyQt6.QtWidgets import QLabel, QHBoxLayout, QPushButton, QTextEdit
@@ -228,3 +235,20 @@ class SettingsWindow(QMainWindow):
     def open_save_dialog_exit(self):
         dialog = SaveSettingsDialog(self)
         dialog.exec()
+
+    def perform_draw(self):
+        # Получить текущие выбранные команды, если они есть
+        selected_teams = [cb.currentText() for cb in self.comboboxes if cb.currentText()]
+        teams = selected_teams if len(selected_teams) == len(self.comboboxes) else self.teams.copy()
+        count = len(self.comboboxes)
+        if len(teams) < count:
+            return  # недостаточно команд
+        random.shuffle(teams)
+        for i, combo in enumerate(self.comboboxes):
+            combo.blockSignals(True)
+            combo.clear()
+            combo.addItem("")
+            combo.addItems(teams)
+            combo.setCurrentIndex(i+1)
+            combo.blockSignals(False)
+        self.handle_combobox_change()
