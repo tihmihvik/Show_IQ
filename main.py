@@ -10,7 +10,5 @@ class Main:
         sys.exit(app.exec())
 
 if __name__ == "__main__":
-    print("main.py стартует")
     main = Main()
     main.run()
-    print("main.py завершён")
